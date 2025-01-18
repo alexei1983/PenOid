@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PenOid", "PenOid.csproj", "{514C55D3-F7D0-4749-86E3-F943BA9DC798}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{514C55D3-F7D0-4749-86E3-F943BA9DC798}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{514C55D3-F7D0-4749-86E3-F943BA9DC798}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{514C55D3-F7D0-4749-86E3-F943BA9DC798}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{514C55D3-F7D0-4749-86E3-F943BA9DC798}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B9E30319-D1EC-44CF-85C8-F4F9DD2D1236}
+	EndGlobalSection
+EndGlobal
