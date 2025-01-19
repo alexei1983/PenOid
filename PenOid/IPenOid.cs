@@ -41,6 +41,18 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <returns></returns>
+        bool IsDescendentOf(IPenOid penOid);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        bool IsChildOf(IPenOid penOid);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         IPenOid? Next(string? name = null);
     }
 }

@@ -350,6 +350,17 @@ namespace org.goodspace.Utils.Misc
         public override int GetHashCode()
         {
             return ToString().GetHashCode();
+            //unchecked
+            //{
+            //    const int hashingBase = (int)2166136261;
+            //    const int hashingMultiplier = 16777617;
+
+            //    var hash = hashingBase;
+            //    hash = (hash * hashingMultiplier) ^ (Components.Length > 0 ? Components.GetHashCode() : 0);
+            //    hash = (hash * hashingMultiplier) ^ (GetType().GetHashCode());
+            //    hash = (hash * hashingMultiplier) ^ (pen.HasValue ? pen.Value.GetHashCode() : 0);
+            //    return hash;
+            //}
         }
 
         /// <summary>
@@ -901,6 +912,46 @@ namespace org.goodspace.Utils.Misc
         public object Clone()
         {
             return MemberwiseClone();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="penOid"></param>
+        /// <returns></returns>
+        public bool IsDescendentOf(IPenOid penOid)
+        {
+            if (penOid.Components.Length >= Components.Length)
+                return false;
+
+            for (int c = 0; c < Components.Length; c++)
+            {
+                if (c < penOid.Components.Length && penOid.Components[c].Equals(Components[c]))
+                    continue;
+
+                if (c >= penOid.Components.Length)
+                {
+                    var thisPrevious = Components[c - 1];
+                    var otherPrevious = penOid.Components[c - 1];
+
+                    return thisPrevious.Equals(otherPrevious);
+                }
+                else
+                    return false;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="penOid"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public bool IsChildOf(IPenOid penOid)
+        {
+            var thisParent = GetParent();
+            return Equals(thisParent, penOid);
         }
     }
 }
