@@ -449,9 +449,18 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public PenOid? GetParent(string? name = null)
+        public IPenOid? GetParent(string? name = null)
         {
             return GetParent(this, name);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IPenOid? GetParent()
+        {
+            return GetParent(this, null);
         }
 
         /// <summary>
@@ -473,7 +482,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public PenOid Next(string? name = null)
+        public IPenOid Next(string? name = null)
         {
             return Increment(this, name);
         }

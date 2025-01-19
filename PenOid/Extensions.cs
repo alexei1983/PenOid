@@ -58,7 +58,7 @@ namespace org.goodspace.Utils.Misc
         public static object? GetAnonymousProperty(this object anonymous, string propertyName)
         {
             var type = anonymous?.GetType();
-            if (type == null || string.IsNullOrEmpty(propertyName) || !type.IsAnonymousType())
+            if (type == null || string.IsNullOrEmpty(propertyName) || !type.IsAnonymous())
                 return default;
 
             var property = type.GetProperty(propertyName);
@@ -91,7 +91,7 @@ namespace org.goodspace.Utils.Misc
         public static void SetAnonymousProperty<T>(this object anonymous, string propertyName, T? value)
         {
             var type = anonymous?.GetType();
-            if (type == null || string.IsNullOrEmpty(propertyName) || !type.IsAnonymousType())
+            if (type == null || string.IsNullOrEmpty(propertyName) || !type.IsAnonymous())
                 return;
 
             var property = type.GetProperty(propertyName);

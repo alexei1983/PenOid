@@ -30,5 +30,17 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         uint[] Components { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        IPenOid? GetParent();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        IPenOid? Next(string? name = null);
     }
 }

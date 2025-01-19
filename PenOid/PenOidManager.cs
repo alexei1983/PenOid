@@ -18,7 +18,7 @@ namespace org.goodspace.Utils.Misc
         /// <param name="oid"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public PenOid Create(string oid, string name)
+        public IPenOid Create(string oid, string name)
         {
             var penOid = new PenOid(oid, name);
             return Create(penOid);
@@ -31,12 +31,16 @@ namespace org.goodspace.Utils.Misc
         /// <param name="name"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public PenOid CreateNext(PenOid sourcePenOid, string? name = null)
+        public IPenOid? CreateNext(IPenOid sourcePenOid, string? name = null)
         {
             if (!sourcePenOid.IsInitialized)
                 throw new ArgumentException("Invalid OID state.", nameof(sourcePenOid));
 
-            return Create(sourcePenOid.Next(name));
+            var nextPen = sourcePenOid.Next(name);
+
+            if (nextPen != null)
+                return Create(nextPen);
+            return default;
         }
 
         /// <summary>
@@ -45,7 +49,7 @@ namespace org.goodspace.Utils.Misc
         /// <param name="penOid"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public PenOid Create(PenOid penOid)
+        public IPenOid Create(IPenOid penOid)
         {
             if (!Exists(penOid))
             {
@@ -71,7 +75,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
-        public bool Delete(PenOid penOid)
+        public bool Delete(IPenOid penOid)
         {
             try
             {
@@ -90,7 +94,7 @@ namespace org.goodspace.Utils.Misc
         /// <param name="oid"></param>
         /// <param name="name"></param>
         /// <returns></returns>
-        public PenOid Update(string oid, string name)
+        public IPenOid Update(string oid, string name)
         {
             return Update(new PenOid(oid, name));
         }
@@ -101,7 +105,7 @@ namespace org.goodspace.Utils.Misc
         /// <param name="penOid"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public PenOid Update(PenOid penOid)
+        public IPenOid Update(IPenOid penOid)
         {
             if (Exists(penOid))
             {
@@ -117,7 +121,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
-        public bool Assign(PenOid penOid)
+        public bool Assign(IPenOid penOid)
         {
             if (!IsAssigned(penOid))
             {
@@ -134,12 +138,16 @@ namespace org.goodspace.Utils.Misc
         /// <param name="name"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public bool AssignNext(PenOid sourcePenOid, string? name = null)
+        public bool AssignNext(IPenOid sourcePenOid, string? name = null)
         {
             if (!sourcePenOid.IsInitialized)
                 throw new ArgumentException("Invalid OID state.", nameof(sourcePenOid));
 
-            return Assign(sourcePenOid.Next(name));
+            var nextPen = sourcePenOid.Next(name);
+
+            if (nextPen != null)
+                return Assign(nextPen);
+            return false;
         }
 
         /// <summary>
@@ -158,7 +166,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<PenOid> GetAll()
+        public IEnumerable<IPenOid> GetAll()
         {
             return provider.GetAll();
         }
@@ -168,7 +176,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
-        public IEnumerable<PenOid> Get(object? criteria)
+        public IEnumerable<IPenOid> Get(object? criteria)
         {
             var query = provider.CreateQuery(criteria);
             return provider.Get(query);
@@ -189,7 +197,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
-        public bool Unassign(PenOid penOid)
+        public bool Unassign(IPenOid penOid)
         {
             if (IsAssigned(penOid))
             {
@@ -214,7 +222,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="penOids"></param>
-        public void BulkAssign(params PenOid[] penOids)
+        public void BulkAssign(params IPenOid[] penOids)
         {
             provider.BulkAssign(penOids);
         }
@@ -234,7 +242,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
-        public bool IsAssigned(PenOid penOid)
+        public bool IsAssigned(IPenOid penOid)
         {
             return provider.IsAssigned(penOid);
         }
@@ -244,7 +252,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
-        public bool Exists(PenOid penOid)
+        public bool Exists(IPenOid penOid)
         {
             return provider.Exists(penOid);
         }

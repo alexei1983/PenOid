@@ -37,7 +37,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="penOid"></param>
-        public void Update(PenOid penOid)
+        public void Update(IPenOid penOid)
         {
             var sqlCmd = $"UPDATE {settings.TableName} SET {columnNameName} = {parameterNameName} WHERE {columnNameOid} = {parameterNameOid}";
             using var cmd = conn.CreateCommand();
@@ -61,7 +61,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="penOid"></param>
-        public void Create(PenOid penOid)
+        public void Create(IPenOid penOid)
         {
             var sqlCmd = $"INSERT INTO {settings.TableName} ({columnNameOid}, {columnNameName}) VALUES ({parameterNameOid}, {parameterNameName})";
             using var cmd = conn.CreateCommand();
@@ -85,7 +85,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="penOid"></param>
-        public void Delete(PenOid penOid)
+        public void Delete(IPenOid penOid)
         {
             var sqlCmd = $"DELETE FROM {settings.TableName} WHERE {columnNameOid} = {parameterNameOid}";
             using var cmd = conn.CreateCommand();
@@ -103,7 +103,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="penOid"></param>
-        public void Assign(PenOid penOid)
+        public void Assign(IPenOid penOid)
         {
             Create(penOid);
         }
@@ -112,7 +112,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="penOid"></param>
-        public void Unassign(PenOid penOid)
+        public void Unassign(IPenOid penOid)
         {
             Delete(penOid);
         }
@@ -121,14 +121,14 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="penOids"></param>
-        public void BulkCreateOrUpdate(params PenOid[] penOids)
+        public void BulkCreateOrUpdate(params IPenOid[] penOids)
         {
             if (penOids == null || penOids.Length == 0)
                 return;
 
             var parents = penOids.Select(p => p.GetParent()).Distinct();
 
-            List<PenOid> updateOids = [];
+            List<IPenOid> updateOids = [];
 
             if (parents.Any())
             {
@@ -157,7 +157,7 @@ namespace org.goodspace.Utils.Misc
                 }
             }
 
-            List<PenOid> createOids = [.. penOids.Except(updateOids)];
+            List<IPenOid> createOids = [.. penOids.Except(updateOids)];
 
             if (createOids.Count == 0 && updateOids.Count == 0)
                 return;
@@ -233,14 +233,14 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="penOids"></param>
-        public void BulkAssign(params PenOid[] penOids)
+        public void BulkAssign(params IPenOid[] penOids)
         {
             if (penOids == null || penOids.Length == 0)
                 return;
 
             var parents = penOids.Select(p => p.GetParent()).Distinct();
 
-            List<PenOid> existingPens = [];
+            List<IPenOid> existingPens = [];
 
             if (parents.Any())
             {
@@ -256,7 +256,7 @@ namespace org.goodspace.Utils.Misc
                         CommandType = CommandType.Text
                     });
 
-                    PenOid[] children = [..Get(query)];
+                    IPenOid[] children = [..Get(query)];
 
                     if (children.Length > 0)
                         existingPens.AddRange(children);
@@ -312,7 +312,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="oid"></param>
-        public PenOid? Get(string oid)
+        public IPenOid? Get(string oid)
         {
             var sqlCmd = $"SELECT * FROM {settings.TableName} WHERE {columnNameOid} = {parameterNameOid}";
             using var cmd = conn.CreateCommand();
@@ -329,7 +329,7 @@ namespace org.goodspace.Utils.Misc
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<PenOid> GetAll()
+        public IEnumerable<IPenOid> GetAll()
         {
             var sqlCmd = $"SELECT * FROM {settings.TableName}";
             using var cmd = conn.CreateCommand();
@@ -339,7 +339,7 @@ namespace org.goodspace.Utils.Misc
                 yield return penOid;
         }
 
-        static IEnumerable<PenOid> GetFromReader(IDataReader reader)
+        static IEnumerable<IPenOid> GetFromReader(IDataReader reader)
         {
             if (reader == null)
                 yield break;
@@ -378,7 +378,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="query"></param>
-        public IEnumerable<PenOid> Get(IPenOidQuery? query)
+        public IEnumerable<IPenOid> Get(IPenOidQuery? query)
         {
             if (query is SqlPenOidQuery sqlQuery)
             {
@@ -400,7 +400,7 @@ namespace org.goodspace.Utils.Misc
         /// 
         /// </summary>
         /// <param name="query"></param>
-        public PenOid? GetFirstOrDefault(IPenOidQuery? query)
+        public IPenOid? GetFirstOrDefault(IPenOidQuery? query)
         {
             if (query is SqlPenOidQuery sqlQuery)
             {
@@ -423,7 +423,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
-        public bool IsAssigned(PenOid penOid)
+        public bool IsAssigned(IPenOid penOid)
         {
             return Exists(penOid);
         }
@@ -433,7 +433,7 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
-        public bool Exists(PenOid penOid)
+        public bool Exists(IPenOid penOid)
         {
             using var cmd = conn.CreateCommand();
             cmd.CommandText = $"SELECT COUNT({columnNameOid}) FROM {settings.TableName} WHERE {columnNameOid} = {parameterNameOid}";

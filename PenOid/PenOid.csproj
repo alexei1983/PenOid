@@ -8,7 +8,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <SignAssembly>True</SignAssembly>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	<VersionPrefix>1.0.2</VersionPrefix>
+	<VersionPrefix>1.0.3</VersionPrefix>
     <AssemblyOriginatorKeyFile>alexj.snk</AssemblyOriginatorKeyFile>
     <Title>Private Enterprise Number (PEN) Object Identifier (OID) Support in .NET</Title>
     <PackageTags>iana;pen;private enterprise number;oid;penoid</PackageTags>
