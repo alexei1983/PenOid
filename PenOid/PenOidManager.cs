@@ -63,16 +63,6 @@ namespace org.goodspace.Utils.Misc
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="oid"></param>
-        /// <returns></returns>
-        public bool Delete(string oid)
-        {
-            return Delete(new PenOid(oid));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
         public bool Delete(IPenOid penOid)
@@ -185,16 +175,6 @@ namespace org.goodspace.Utils.Misc
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="oid"></param>
-        /// <returns></returns>
-        public bool Unassign(string oid)
-        {
-            return Unassign(new PenOid(oid));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
         public bool Unassign(IPenOid penOid)
@@ -210,31 +190,10 @@ namespace org.goodspace.Utils.Misc
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="oid"></param>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public bool IsAssigned(string oid, string name)
-        {
-            return IsAssigned(new PenOid(oid, name));
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="penOids"></param>
         public void BulkAssign(params IPenOid[] penOids)
         {
             provider.BulkAssign(penOids);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="oid"></param>
-        /// <returns></returns>
-        public bool IsAssigned(string oid)
-        {
-            return IsAssigned(new PenOid(oid));
         }
 
         /// <summary>

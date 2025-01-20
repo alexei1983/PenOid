@@ -4,7 +4,7 @@ namespace org.goodspace.Utils.Misc
     /// <summary>
     /// 
     /// </summary>
-    public interface IPenOid : ICloneable
+    public interface IPenOid : ICloneable, IEquatable<IPenOid>, IComparable<IPenOid>
     {
         /// <summary>
         /// 
@@ -40,19 +40,29 @@ namespace org.goodspace.Utils.Misc
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="penOid"></param>
         /// <returns></returns>
         bool IsDescendentOf(IPenOid penOid);
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="penOid"></param>
         /// <returns></returns>
         bool IsChildOf(IPenOid penOid);
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="name"></param>
         /// <returns></returns>
         IPenOid? Next(string? name = null);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        IPenOid Previous(string? name = null);
     }
 }

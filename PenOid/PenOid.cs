@@ -9,8 +9,9 @@ namespace org.goodspace.Utils.Misc
     /// <summary>
     /// Represents an IANA-assigned Private Enterprise Number (PEN) object identifier (OID).
     /// </summary>
-    public partial class PenOid : IPenOid, ICloneable, IEquatable<PenOid>, IEquatable<string>, IEquatable<Oid>, IComparable, IComparable<PenOid>,
-        IComparable<string>, IComparable<Oid>, IFormattable
+    public partial class PenOid : IPenOid, ICloneable, IEquatable<PenOid>, IEquatable<IPenOid>, IEquatable<string>, 
+                                  IEquatable<Oid>, IComparable, IComparable<PenOid>, IComparable<IPenOid>,
+                                  IComparable<string>, IComparable<Oid>, IFormattable
     {
         /// <summary>
         /// The prefix for Private Enterprise Number (PEN) assignments.
@@ -202,6 +203,21 @@ namespace org.goodspace.Utils.Misc
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="oidCollection"></param>
+        /// <returns></returns>
+        public static IEnumerable<IPenOid> FromOidCollection(OidCollection oidCollection)
+        {
+            foreach (var oid in oidCollection)
+            {
+                if (oid == null)
+                    continue;
+                yield return new PenOid(oid);
+            }
+        }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="PenOid"/> class.
         /// </summary>
         /// <param name="source">Source <see cref="PenOid"/> object.</param>
@@ -219,14 +235,17 @@ namespace org.goodspace.Utils.Misc
         /// <returns>True on equality, else false.</returns>
         public override bool Equals(object? obj)
         {
-            if (obj is PenOid penOid)
-                return penOid.ToString().Equals(ToString());
+            //if (obj is PenOid penOid)
+            //    return penOid.ToString().Equals(ToString());
+
+            if (obj is IPenOid iPenOid)
+                return iPenOid.IsInitialized && IsInitialized && CompareTo(iPenOid) == 0;
 
             if (obj is Oid oid)
-                return ToString().Equals(oid.Value ?? string.Empty);
+                return !string.IsNullOrEmpty(oid.Value) && ToString().Equals(oid.Value);
 
             if (obj is string strOid)
-                return ToString().Equals(strOid);
+                return !string.IsNullOrEmpty(strOid) && ToString().Equals(strOid);
 
             return false;
         }
@@ -274,14 +293,13 @@ namespace org.goodspace.Utils.Misc
             if (obj == null)
                 return -1;
 
-            // string oid;
             uint[] _components = [];
 
             try
             {
                 if (obj is string strOid)
                     _components = new PenOid(strOid).Components;
-                else if (obj is PenOid penOid)
+                else if (obj is IPenOid penOid)
                     _components = penOid.Components;
                 else if (obj is Oid oidObj)
                     _components = new PenOid(oidObj).Components;
@@ -349,18 +367,193 @@ namespace org.goodspace.Utils.Misc
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
-            //unchecked
-            //{
-            //    const int hashingBase = (int)2166136261;
-            //    const int hashingMultiplier = 16777617;
+            unchecked
+            {
+                const int hashingBase = 2142136263;
+                const int hashingMultiplier = 13791239;
 
-            //    var hash = hashingBase;
-            //    hash = (hash * hashingMultiplier) ^ (Components.Length > 0 ? Components.GetHashCode() : 0);
-            //    hash = (hash * hashingMultiplier) ^ (GetType().GetHashCode());
-            //    hash = (hash * hashingMultiplier) ^ (pen.HasValue ? pen.Value.GetHashCode() : 0);
-            //    return hash;
-            //}
+                var hash = hashingBase;
+
+                hash = (hash * hashingMultiplier) ^ (GetType().GetHashCode());
+
+                if (!IsInitialized)
+                {
+                    hash = (hash * hashingMultiplier) ^ (Guid.NewGuid().GetHashCode());
+                    return hash;
+                }
+
+                var tmpComponentHash = (uint)hashingBase;
+
+                foreach (var component in Components)
+                    tmpComponentHash ^= component;
+
+                hash = (hash * hashingMultiplier) ^ (tmpComponentHash.GetHashCode());
+                hash = (hash * hashingMultiplier) ^ (pen.HasValue ? pen.Value.GetHashCode() : 0);
+
+                return hash;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator ==(PenOid? a, PenOid? b) => Equals(a, b);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator !=(PenOid? a, PenOid? b) => !Equals(a, b);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator >(PenOid? a, PenOid? b)
+        {
+            if (a == null || b == null)
+                return false;
+
+            return a.CompareTo(b) > 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator <(PenOid? a, PenOid? b)
+        {
+            if (a == null || b == null)
+                return false;
+
+            return a.CompareTo(b) < 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator <=(PenOid? a, PenOid? b)
+        {
+            if (a == null)
+                return b == null;
+
+            return a.CompareTo(b) <= 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="penOid"></param>
+        /// <returns></returns>
+        public static PenOid operator ++(PenOid penOid)
+        {
+            if (penOid.Next() is PenOid _penOid)
+                return _penOid;
+            return penOid;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="penOid"></param>
+        /// <returns></returns>
+        public static PenOid operator --(PenOid penOid)
+        {
+            if (penOid.Previous() is PenOid _penOid)
+                return _penOid;
+            return penOid;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator >=(PenOid? a, PenOid? b)
+        {
+            if (a == null)
+                return b == null;
+
+            return a.CompareTo(b) >= 0;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="penOid"></param>
+        public static implicit operator string?(PenOid? penOid)
+        {
+            return penOid?.ToString();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="oid"></param>
+        public static explicit operator PenOid?(string? oid)
+        {
+            if (!string.IsNullOrEmpty(oid))
+                return new PenOid(oid);
+            return default;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="components"></param>
+        public static explicit operator PenOid?(uint[]? components)
+        {
+            if (components != null && components.Length > 0)
+                return new PenOid(string.Join(OID_SEPARATOR, components));
+            return default;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="oid"></param>
+        public static explicit operator PenOid?(Oid? oid)
+        {
+            if (oid != null)
+                return new PenOid(oid);
+            return default;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="penOid"></param>
+        public static implicit operator Oid?(PenOid? penOid)
+        {
+            if (penOid != null && penOid.IsInitialized)
+                return new Oid(penOid.Value, penOid.Name);
+
+            return default;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="penOid"></param>
+        public static implicit operator uint[]?(PenOid? penOid)
+        {
+            if (penOid != null && penOid.IsInitialized)
+                return penOid.Components;
+
+            return default;
         }
 
         /// <summary>
@@ -501,6 +694,16 @@ namespace org.goodspace.Utils.Misc
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public IPenOid Previous(string? name = null)
+        {
+            return Decrement(this, name);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="start"></param>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -522,7 +725,7 @@ namespace org.goodspace.Utils.Misc
                         _components[i] = 0;
                         continue;
                     }
-                    else if (currentComponent > uint.MinValue)
+                    else if (currentComponent >= uint.MinValue)
                     {
                         _components[i] = (uint)currentComponent;
                         break;
@@ -533,6 +736,47 @@ namespace org.goodspace.Utils.Misc
 
                 if (newPen.Equals(start))
                     throw new Exception($"Cannot increment OID: {start}");
+
+                return newPen;
+            }
+            throw new Exception($"Cannot clone OID components from source: {start}");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private static PenOid Decrement(PenOid start, string? name = null)
+        {
+            if (start.Components.Clone() is uint[] _components)
+            {
+                for (int i = _components.Length - 1; i >= _components.Length - 7; i--)
+                {
+                    if (i < 7)
+                        throw new Exception($"Cannot decrement OID: {start}");
+
+                    long currentComponent = _components[i];
+                    currentComponent--;
+
+                    if (currentComponent < uint.MinValue)
+                    {
+                        _components[i] = uint.MaxValue;
+                        continue;
+                    }
+                    else if (currentComponent >= uint.MinValue)
+                    {
+                        _components[i] = (uint)currentComponent;
+                        break;
+                    }
+                }
+
+                var newPen = new PenOid(name, _components);
+
+                if (newPen.Equals(start))
+                    throw new Exception($"Cannot decrement OID: {start}");
 
                 return newPen;
             }
@@ -658,8 +902,22 @@ namespace org.goodspace.Utils.Misc
         /// <param name="childStart"></param>
         /// <param name="childEnd"></param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
         public async Task<PenOid[]> GenerateAsync(uint parentStart, uint parentEnd, uint childStart, uint childEnd)
+        {
+            return await GenerateAsync(parentStart, parentEnd, childStart, childEnd, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parentStart"></param>
+        /// <param name="parentEnd"></param>
+        /// <param name="childStart"></param>
+        /// <param name="childEnd"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task<PenOid[]> GenerateAsync(uint parentStart, uint parentEnd, uint childStart, uint childEnd, CancellationToken token)
         {
             if (parentEnd < parentStart)
                 throw new ArgumentException("Parent ending number cannot be less than parent starting number.", nameof(parentEnd));
@@ -669,7 +927,13 @@ namespace org.goodspace.Utils.Misc
 
             ConcurrentBag<PenOid> bag = [];
 
-            await Parallel.ForAsync(parentStart, parentEnd, async (p, token) =>
+            var parallelOptions = new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
+                CancellationToken = token,
+            };
+
+            await Parallel.ForAsync(parentStart, parentEnd, parallelOptions, async (p, token) =>
             {
                 await Task.Run(() =>
                 {
@@ -679,12 +943,15 @@ namespace org.goodspace.Utils.Misc
                         parentPen.AppendComponent(p);
                         bag.Add(parentPen);
 
-                        Parallel.For(childStart, childEnd, (c) =>
-                        {
-                            var childPen = new PenOid(parentPen);
-                            childPen.AppendComponent((uint)c);
+                        foreach (var childPen in parentPen.Generate(childStart, childEnd))
                             bag.Add(childPen);
-                        });
+
+                        //Parallel.For(childStart, childEnd, parallelOptions, (c) =>
+                        //{
+                        //    var childPen = new PenOid(parentPen);
+                        //    childPen.AppendComponent((uint)c);
+                        //    bag.Add(childPen);
+                        //});
                     }
                 }, token);
             });
@@ -737,18 +1004,26 @@ namespace org.goodspace.Utils.Misc
 
             ConcurrentBag<PenOid> bag = [];
 
-            Parallel.For(parentStart, parentEnd, (p) =>
+            var parallelOptions = new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount * 2,
+            };
+
+            Parallel.For(parentStart, parentEnd, parallelOptions, (p) =>
             {
                 var parentPen = new PenOid(this);
                 parentPen.AppendComponent((uint)p);
                 bag.Add(parentPen);
 
-                Parallel.For(childStart, childEnd, (c) =>
-                {
-                    var childPen = new PenOid(parentPen);
-                    childPen.AppendComponent((uint)c);
+                foreach (var childPen in parentPen.Generate(childStart, childEnd))
                     bag.Add(childPen);
-                });
+
+                //Parallel.For(childStart, childEnd, parallelOptions , (c) =>
+                //{
+                //    var childPen = new PenOid(parentPen);
+                //    childPen.AppendComponent((uint)c);
+                //    bag.Add(childPen);
+                //});
             });
 
             foreach (var _pen in bag.Order())
@@ -911,7 +1186,13 @@ namespace org.goodspace.Utils.Misc
         /// <returns></returns>
         public object Clone()
         {
-            return MemberwiseClone();
+            if (!IsInitialized)
+                return new PenOid();
+
+            if (Components.Clone() is uint[] _components)
+                return new PenOid(Name, _components);
+
+            throw new InvalidOperationException("Unable to clone the current instance.");
         }
 
         /// <summary>
@@ -947,11 +1228,30 @@ namespace org.goodspace.Utils.Misc
         /// </summary>
         /// <param name="penOid"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
         public bool IsChildOf(IPenOid penOid)
         {
             var thisParent = GetParent();
             return Equals(thisParent, penOid);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(IPenOid? other)
+        {
+            return Equals((object?)other);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public int CompareTo(IPenOid? other)
+        {
+            return CompareTo((object?)other);
         }
     }
 }
